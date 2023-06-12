@@ -7,40 +7,54 @@
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 
     <script>
-        
+        var So = [];
 
         //parametros rango de visualizacion
         var definicionX = 1000;
-        var extremoX;
+        var extremoX = 3;
 
         var definicionL = 1000;
-        var extremoL;
+        var extremoL = 0.5;
         var extremoLinf = 0;
 
         var xpts = [];
         var L = [];
         var So = [];
-        
+
+        for (var i = 0; i < definicionX; i++) {
+            var value = -extremoX + (2 * extremoX / (definicionX - 1)) * i;
+            xpts.push(value);
+        }
+        for (var i = 0; i < definicionL; i++) {
+            var value = extremoLinf + ((extremoL - extremoLinf) / (definicionL - 1)) * i;
+            L.push(value);
+        }
+
+        for (var i = 0; i < definicionX; i++) {
+            var aux = []
+            for (var j = 0; j < definicionL; j++) {
+                aux.push(0);
+            }
+            So.push(aux);
+        }
 
 
         function enviarValores(event) {
             event.preventDefault(); // Evita que el formulario se envíe automáticamente
-    
+
             // Obtén los valores de los inputs
             var numero1 = parseFloat(document.getElementById('delta').value);
             //var numero2 = parseFloat(document.getElementById('a').value);
-            //var numero3=    parseFloat(document.getElementById('lambda').value);
-            var numero4=    parseFloat(document.getElementById('D').value);
-            var numero5=    parseFloat(document.getElementById('d').value);
-            var numero6=    parseFloat(document.getElementById('Lo').value);
+            var numero3 = parseFloat(document.getElementById('lambda').value);
+            var numero4 = parseFloat(document.getElementById('D').value);
+            var numero5 = parseFloat(document.getElementById('d').value);
+            var numero6 = parseFloat(document.getElementById('Lo').value);
             // Pasa los valores a la función deseada
-            calcular(1, numero1, 1,numero6,numero5,numero4, 3,0.5);
+            calcular(1, numero1, numero3, numero6, numero5, numero4, 3, 0.5);
         }
-    
-
-        function calcular(a, delta, lambda, Lo, d, D, extX,extL) {
 
 
+        function calcular(a, delta, lambda, Lo, d, D, extX, extL) {
 
             extremoL = extL;
             extremoX = extX;
@@ -69,8 +83,13 @@
             crearMapaCalor(a, delta, lambda, Lo, d, D);
             crearGrafico3D();
 
-            crearMapaCalor(a, delta, lambda, Lo, d, D);
-            crearGrafico3D();
+            
+           
+
+            
+
+            
+
         }
 
         function crearMapaCalor(a, delta, lambda, Lo, d, D) {
@@ -84,7 +103,7 @@
 
                 for (var j = 0; j < definicionL; j++) {
 
-                    var coc1 = Math.pow(delta, 2) + Math.pow(lambda * L[j] / (Math.PI * delta),2);
+                    var coc1 = Math.pow(delta, 2) + Math.pow(lambda * L[j] / (Math.PI * delta), 2);
 
                     var exp1 = Math.exp(-2 * Math.pow(xpts[i] - a / 2, 2) / coc1);
 
@@ -119,8 +138,8 @@
 
             var mapaCalor = {
                 z: So,
-                x:  L,
-                y:xpts,
+                x: L,
+                y: xpts,
                 type: 'heatmap',
                 colorscale: 'YlOrRd'
             };
@@ -137,7 +156,7 @@
                     title: 'Instensidad normalizada'
                 }
             };
-            
+
 
             Plotly.newPlot('mapa-calor', [mapaCalor], layout);
         }
@@ -192,11 +211,11 @@
             display: flex;
             justify-content: center;
 
-          }
-      
-          button {
+        }
+
+        button {
             margin-right: 30px;
-          }
+        }
     </style>
 
     <h3 text-center>
@@ -226,8 +245,8 @@
     </h3>
     <div>
         <button onclick="calcular(1e-8, 1e-9, 550e-9, 1.5e11, 1e-9, 1e-6, 5, 0.5)">Ejemplo Sol</button>
-        <button onclick="calcular(1e-8, 1e-9, 600e-9, 1.5e11, 1e-9, 1e-6, 5, 0.5)">Ejemplo Sodio</button>
-      </div>
+        <button onclick="calcular(1e-8, 1e-9, 550e-9, 1.5e11, 1e-9, 1e-6, 5, 0.5)">Ejemplo Sol</button>
+    </div>
 
 
     <h3 text-center>
@@ -245,8 +264,8 @@
         <!--<label for="a">a:</label>
         <input type="number" id="a" step="any" value="1" min="0" required><br><br>-->
 
-        <!--<label for="lambda">λ:</label>
-        <input type="number" id="lambda" step="any" value="1" min="0" required><br><br>-->
+        <label for="lambda">λ:</label>
+        <input type="number" id="lambda" step="any" value="1" min="0" required><br><br>
 
         <label for="D">D/a:</label>
         <input type="number" id="D" step="any" value="10" min="0" required><br><br>
