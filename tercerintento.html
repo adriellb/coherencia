@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Mi primera página web</title>
+
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+    <script>
+        var So = [];
+
+        //parametros rango de visualizacion
+        var definicionX = 1000;
+        var extremoX;
+
+        var definicionL = 1000;
+        var extremoL;
+        var extremoLinf = 0;
+
+        var xpts = [];
+        var L = []
+        var So = []
+        
+
+
+        function enviarValores(event) {
+            event.preventDefault(); // Evita que el formulario se envíe automáticamente
+    
+            // Obtén los valores de los inputs
+            var numero1 = parseFloat(document.getElementById('delta').value);
+            //var numero2 = parseFloat(document.getElementById('a').value);
+            var numero3=    parseFloat(document.getElementById('lambda').value);
+            var numero4=    parseFloat(document.getElementById('D').value);
+            var numero5=    parseFloat(document.getElementById('d').value);
+            var numero6=    parseFloat(document.getElementById('Lo').value);
+            // Pasa los valores a la función deseada
+            calcular(1, numero1, numero3,numero6,numero5,numero4, 3,0.5);
+        }
+    
+
+        function calcular(a, delta, lambda, Lo, d, D, extX,extL) {
+
+            extremoL=extL;
+            extremoX=extX;
+
+            for (var i = 0; i < definicionX; i++) {
+                var value = -extremoX + (2 * extremoX / (definicionX - 1)) * i;
+                xpts.push(value);
+            }
+            for (var i = 0; i < definicionX; i++) {
+                var value = extremoLinf + ((extremoL - extremoLinf) / (definicionL - 1)) * i;
+                L.push(value);
+            }
+
+            for (var i = 0; i < definicionX; i++) {
+                var aux = []
+                for (var j = 0; j < definicionL; j++) {
+                    aux.push(0);
+                }
+                So.push(aux);
+            }
+
+
+            crearMapaCalor(a, delta, lambda, Lo, d, D);
+            crearGrafico3D();
+        }
+
+        function crearMapaCalor(a, delta, lambda, Lo, d, D) {
+
+            //Generacion datos mapa de color
+            var ell = Math.pow(d, 2) + Math.pow(lambda * Lo / (Math.PI * D), 2);
+
+            var coher = a * a / (2 * ell);
+
+            for (var i = 0; i < definicionX; i++) {
+
+                for (var j = 0; j < definicionL; j++) {
+
+                    var coc1 = Math.pow(delta, 2) + Math.pow(lambda * L[j] / (Math.PI * delta),2);
+
+                    var exp1 = Math.exp(-2 * Math.pow(xpts[i] - a / 2, 2) / coc1);
+
+                    var exp2 = Math.exp(-2 * Math.pow(xpts[i] + a / 2, 2) / coc1);
+
+                    var exp3 = Math.exp((-2 * xpts[i] * xpts[i] - a * a / 2) / coc1 - coher);
+
+                    var cos1 = Math.cos(2 * a * L[j] * xpts[i] * lambda / (Math.PI * delta * delta * coc1));
+
+                    So[i][j] = (exp1 + exp2) / 2 + exp3 * cos1;
+                }
+
+            }
+
+            //buscar el maximo
+            var maximo = Number.MIN_SAFE_INTEGER;
+
+            for (var i = 0; i < definicionX; i++) {
+                for (var j = 0; j < definicionL; j++) {
+                    if (So[i][j] > maximo) {
+                        maximo = So[i][j];
+                    }
+                }
+            }
+
+            //normalizo
+            for (var i = 0; i < definicionX; i++) {
+                for (var j = 0; j < definicionL; j++) {
+                    So[i][j] = So[i][j] / maximo;
+                }
+            }
+
+            var mapaCalor = {
+                z: So,
+                x:  L,
+                y:xpts,
+                type: 'heatmap',
+                colorscale: 'YlOrRd'
+            };
+
+            var layout = {
+                title: "Patrón de interferencia 2D",
+                xaxis: {
+                    title: 'Eje L'
+                },
+                yaxis: {
+                    title: 'Eje X'
+                },
+                zaxis: {
+                    title: 'Instensidad normalizada'
+                }
+            };
+            
+
+            Plotly.newPlot('mapa-calor', [mapaCalor], layout);
+        }
+
+
+        function crearGrafico3D() {
+            var data = [{
+                z: So,
+                x: L,
+                y: xpts,
+                type: 'surface',
+                colorscale: 'YlOrRd'
+            }];
+
+            var layout = {
+                title: 'Patrón de Interferencia 3D',
+                autosize: false,
+                width: definicionX,
+                height: definicionL,
+                margin: {
+                    l: 65,
+                    r: 50,
+                    b: 65,
+                    t: 90,
+                },
+                xaxis: {
+                    title: 'Eje X'
+                },
+                yaxis: {
+                    title: 'Eje L'
+                },
+                zaxis: {
+                    title: 'Instensidad normalizada'
+                }
+            };
+
+            Plotly.newPlot('grafico-3d', data, layout);
+        }
+
+    </script>
+
+</head>
+
+<body>
+    <h1>Laboratorio coherente para personas incoherentes</h1>
+    <style>
+        body {
+            text-align: center;
+        }
+
+        div {
+            display: flex;
+            justify-content: center;
+
+          }
+      
+          button {
+            margin-right: 30px;
+          }
+    </style>
+
+    <h3 text-center>
+        Esstudiaremos la interferencia de un paquete de onda conformado por la mezcla de multiples funciones de onda al
+        pasar por dos rendijas, sin asumir que el paquete de ondas es originalmente coherente.
+
+        <br>
+        En la siguiente imagen hay un esquema sobre la situación analizada:
+
+        <p align="center">
+            <img src="esquemaInfamo.png" <p>
+
+        </p>
+
+        <ul>
+            <li><em>a</em> es la distancia entre rendijas</li>
+            <li><em>δ</em> es el ancho de las rendijas normalizado por su separación</li>
+            <li><em>d</em> es el ancho de una función de onda</li>
+            <li><em>D</em> es el ancho del colimador</li>
+            <li><em>Lo</em> es la distancia desde la fuente a las rendijas</li>
+            <li><em>L</em> y <em>X</em> describen los puntos del espacio después de las rendijas</li>
+        </ul>
+
+
+        A continuación hay botones que permiten ver los parámetros utilizados para algunos ejemplos típicos, por
+        ejemplo, luz que llega del Sol.
+    </h3>
+    <div>
+        <button onclick="calcular(1e-8, 1e-9, 550e-9, 1.5e11, 1e-9, 1e-6, 5, 0.5)">Ejemplo Sol</button>
+        <button onclick="calcular(1e-8, 1e-9, 550e-9, 1.5e11, 1e-9, 1e-6, 5, 0.5)">Ejemplo Sol</button>
+      </div>
+
+
+    <h3 text-center>
+        Si querés experimentar con tus propios valores, acá los podes introducir:
+    </h3>
+
+
+
+    <form onsubmit="enviarValores(event)">
+
+        <label for="delta">δ/a:</label>
+        <input type="number" id="delta" step="any" value="0.1" min="0" required><br><br>
+
+
+        <!--<label for="a">a:</label>
+        <input type="number" id="a" step="any" value="1" min="0" required><br><br>-->
+
+        <label for="lambda">λ:</label>
+        <input type="number" id="lambda" step="any" value="1" min="0" required><br><br>
+
+        <label for="D">D/a:</label>
+        <input type="number" id="D" step="any" value="10" min="0" required><br><br>
+
+        <label for="d">d/a:</label>
+        <input type="number" id="d" step="any" value="0.1" min="0" required><br><br>
+
+        <label for="Lo">Lo/a:</label>
+        <input type="number" id="Lo" step="any" value="8" min="0" required><br><br>
+
+        <button type="submit">Calcular</button>
+    </form>
+
+
+    <p id="resultado"></p>
+
+    <div id="mapa-calor"></div>
+
+    <div id="grafico-3d"></div>
+
+</body>
+
+</html>
