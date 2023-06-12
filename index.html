@@ -17,7 +17,9 @@
         var extremoL;
         var extremoLinf = 0;
 
-        
+        var xpts = [];
+        var L = [];
+        var So = [];
         
 
 
@@ -27,18 +29,22 @@
             // Obtén los valores de los inputs
             var numero1 = parseFloat(document.getElementById('delta').value);
             //var numero2 = parseFloat(document.getElementById('a').value);
-            var numero3=    parseFloat(document.getElementById('lambda').value);
+            //var numero3=    parseFloat(document.getElementById('lambda').value);
             var numero4=    parseFloat(document.getElementById('D').value);
             var numero5=    parseFloat(document.getElementById('d').value);
             var numero6=    parseFloat(document.getElementById('Lo').value);
             // Pasa los valores a la función deseada
-            calcular(1, numero1, numero3,numero6,numero5,numero4, 3,0.5);
+            calcular(1, numero1, 1,numero6,numero5,numero4, 3,0.5);
         }
     
 
         function calcular(a, delta, lambda, Lo, d, D, extX,extL) {
 
-            
+
+
+            extremoL = extL;
+            extremoX = extX;
+
             var xpts = [];
             var L = [];
             var So = [];
@@ -47,7 +53,7 @@
                 var value = -extremoX + (2 * extremoX / (definicionX - 1)) * i;
                 xpts.push(value);
             }
-            for (var i = 0; i < definicionX; i++) {
+            for (var i = 0; i < definicionL; i++) {
                 var value = extremoLinf + ((extremoL - extremoLinf) / (definicionL - 1)) * i;
                 L.push(value);
             }
@@ -60,6 +66,8 @@
                 So.push(aux);
             }
 
+            crearMapaCalor(a, delta, lambda, Lo, d, D);
+            crearGrafico3D();
 
             crearMapaCalor(a, delta, lambda, Lo, d, D);
             crearGrafico3D();
@@ -199,7 +207,7 @@
         En la siguiente imagen hay un esquema sobre la situación analizada:
 
         <p align="center">
-            <img src="esquemaInfamo.png" <p>
+            <img src="./images/esquemaInfamo.png" <p>
 
         </p>
 
@@ -218,7 +226,7 @@
     </h3>
     <div>
         <button onclick="calcular(1e-8, 1e-9, 550e-9, 1.5e11, 1e-9, 1e-6, 5, 0.5)">Ejemplo Sol</button>
-        <button onclick="calcular(1e-8, 1e-9, 550e-9, 1.5e11, 1e-9, 1e-6, 5, 0.5)">Ejemplo Sol</button>
+        <button onclick="calcular(1e-8, 1e-9, 600e-9, 1.5e11, 1e-9, 1e-6, 5, 0.5)">Ejemplo Sodio</button>
       </div>
 
 
@@ -237,8 +245,8 @@
         <!--<label for="a">a:</label>
         <input type="number" id="a" step="any" value="1" min="0" required><br><br>-->
 
-        <label for="lambda">λ:</label>
-        <input type="number" id="lambda" step="any" value="1" min="0" required><br><br>
+        <!--<label for="lambda">λ:</label>
+        <input type="number" id="lambda" step="any" value="1" min="0" required><br><br>-->
 
         <label for="D">D/a:</label>
         <input type="number" id="D" step="any" value="10" min="0" required><br><br>
