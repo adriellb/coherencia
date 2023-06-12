@@ -7,7 +7,7 @@
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 
     <script>
-        var So = [];
+        
 
         //parametros rango de visualizacion
         var definicionX = 1000;
@@ -17,9 +17,7 @@
         var extremoL;
         var extremoLinf = 0;
 
-        var xpts = [];
-        var L = []
-        var So = []
+        
         
 
 
@@ -40,8 +38,10 @@
 
         function calcular(a, delta, lambda, Lo, d, D, extX,extL) {
 
-            extremoL=extL;
-            extremoX=extX;
+            
+            var xpts = [];
+            var L = [];
+            var So = [];
 
             for (var i = 0; i < definicionX; i++) {
                 var value = -extremoX + (2 * extremoX / (definicionX - 1)) * i;
@@ -199,7 +199,7 @@
         En la siguiente imagen hay un esquema sobre la situación analizada:
 
         <p align="center">
-            <img src="./images/esquemaInfamo.png" <p>
+            <img src="esquemaInfamo.png" <p>
 
         </p>
 
